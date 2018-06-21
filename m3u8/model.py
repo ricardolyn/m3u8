@@ -333,7 +333,7 @@ class Segment(BasePathMixin):
 
     def __init__(self, uri, base_uri, program_date_time=None, duration=None,
                  title=None, byterange=None, cue_out=False, discontinuity=False, key=None,
-                 scte35=None, scte35_duration=None, keyobject=None):
+                 scte35=None, scte35_duration=None, keyobject=None, tvgId=None, tvgLogo=None):
         self.uri = uri
         self.duration = duration
         self.title = title
@@ -345,6 +345,8 @@ class Segment(BasePathMixin):
         self.scte35 = scte35
         self.scte35_duration = scte35_duration
         self.key = keyobject
+        self.tvgId = tvgId
+        self.tvgLogo = tvgLogo
         # Key(base_uri=base_uri, **key) if key else None
 
     def dumps(self, last_segment):
@@ -365,9 +367,15 @@ class Segment(BasePathMixin):
                               format_date_time(self.program_date_time))
         if self.cue_out:
             output.append('#EXT-X-CUE-OUT-CONT\n')
-        output.append('#EXTINF:%s,' % int_or_float_to_string(self.duration))
+        output.append('#EXTINF:%s ' % int_or_float_to_string(self.duration))
+        if self.tvgId:
+            output.append("tvg-id=%s" % quoted(self.tvgId))
+        if self.tvgLogo:
+            output.append("tvg-logo=%s" % quoted(self.tvgLogo))
+        
+        output.append(",")
         if self.title:
-            output.append(quoted(self.title))
+            output.append(self.title)
 
         output.append('\n')
 
